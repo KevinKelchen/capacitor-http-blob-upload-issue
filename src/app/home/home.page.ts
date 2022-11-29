@@ -1,6 +1,6 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Component } from '@angular/core';
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, lastValueFrom } from "rxjs";
 
 @Component({
   selector: 'app-home',
@@ -12,23 +12,20 @@ export class HomePage {
     private httpClient: HttpClient
   ) {}
 
-  async requestWithEncodedSpace() {
-    // URL with an encoded space (via the `+` character) works as expected.
-    const url = 'https://swapi.dev/api/people/?search=r2+d2';
+  async requestBlob() {
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+    });
 
-    await this.makeRequest(url);
-  }
+    const result = await lastValueFrom(
+      // Our production app uses an API that requests a Blob via a POST,
+      // but this issue appears reproducible using a GET.
+      this.httpClient.get('https://picsum.photos/id/237/200/300', {
+        headers,
+        responseType: 'blob',
+      })
+    );
 
-  async requestWithoutEncodedSpace() {
-    // URL with a non-encoded space fails on hybrid iOS.
-    const url = 'https://swapi.dev/api/people/?search=r2 d2';
-
-    await this.makeRequest(url);
-  }
-
-  private async makeRequest(url: string) {
-    const result = await firstValueFrom(this.httpClient.get(url));
-
-    console.dir(result);
+    console.log(result);
   }
 }
