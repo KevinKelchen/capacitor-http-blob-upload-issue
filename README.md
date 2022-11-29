@@ -58,17 +58,15 @@ To debug the WebView, follow the instructions [here](https://ionicframework.com/
 
 ## Steps to Reproduce
 
-- Get the app running by following [Running the App](#running-the-app) for iOS.
-- Once the app is running, open the Safari Web Inspector by following instructions in [Debugging the App](#debugging-the-app). Open the Console view.
-- There are two buttons in the app's UI: `Request With Encoded Space` and `Request Without Encoded Space`.
-  - Their click events will be handled in `/src/app/home/home.page.ts`.
-  - They will make network requests to the [Star Wars API](https://swapi.dev/) using the Angular `HttpClient` which will use the `CapacitorHttp` plugin at a lower-level.
-- Click the button that says `Request With Encoded Space`.
-  - In the console, you'll see the `CapacitorHttp` request and result objects, as well as a printed object of the response body. The request was successful.
-- Now click the button that says `Request Without Encoded Space`.
-  - In the console, you'll see the `CapacitorHttp` request and result objects. The result shows an error:
-    - ```json
-      {
-        message: "Invalid URL", errorMessage: "Invalid URL"
-      }
+- Get the app running by following [Running the App](#running-the-app) for iOS or Android.
+- Once the app is running, open the Safari Web Inspector or Chrome Dev Tools inspector by following instructions in [Debugging the App](#debugging-the-app). Open the Console view.
+- There is one button in the app's UI: `Request Blob`.
+  - The click event will be handled in `/src/app/home/home.page.ts`.
+  - It will make a network request to retrieve an image as a Blob using the Angular `HttpClient` which will use the `CapacitorHttp` plugin at a lower-level.
+- Click the button that says `Request Blob`.
+  - In the console, you'll see the `CapacitorHttp` request and result objects. The results vary by platform, but are both failures to work as expected:
+    - iOS
+      - The request invocation doesn't blow up with an unhandled error, but the response/Blob is `null`.
+    - Android
+      - The request invocation blows up with an unhandled error: `ERROR Error: Uncaught (in promise): Error: Response is not a Blob.`
 
