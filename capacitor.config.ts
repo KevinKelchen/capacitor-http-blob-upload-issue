@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'capacitor-http-request-blob-issue',
+  appName: 'capacitor-http-blob-upload-issue',
   webDir: 'www',
   bundledWebRuntime: false,
   plugins: {

@@ -1,5 +1,5 @@
 {
-  "name": "capacitor-http-request-blob-issue",
+  "name": "capacitor-http-blob-upload-issue",
   "integrations": {
     "capacitor": {}
   },
