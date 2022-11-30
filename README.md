@@ -60,13 +60,49 @@ To debug the WebView, follow the instructions [here](https://ionicframework.com/
 
 - Get the app running by following [Running the App](#running-the-app) for iOS or Android.
 - Once the app is running, open the Safari Web Inspector or Chrome Dev Tools inspector by following instructions in [Debugging the App](#debugging-the-app). Open the Console view.
-- There is one button in the app's UI: `Request Blob`.
-  - The click event will be handled in `/src/app/home/home.page.ts`.
-  - It will make a network request to retrieve an image as a Blob using the Angular `HttpClient` which will use the `CapacitorHttp` plugin at a lower-level.
-- Click the button that says `Request Blob`.
+- There is an `<input type="file"/>` on the screen which renders a `Choose File` button.
+  - The input's `change` event will be handled in `/src/app/home/home.page.ts`.
+  - It will make a network request to send the File Blob within `FormData` using the Angular `HttpClient` which will use the `CapacitorHttp` plugin at a lower-level.
+  - **Note:** In our production app, we are uploading files to our server and sending the `File` `Blob` *without* using `FormData`. For this repro, `file.io` seemed like a simple, reasonable solution for an endpoint that accepts file upload. However, it seems to require the use of `FormData`. Hopefully the repro will capture the issue we're having in our production app.
+- Click the button that says `Choose File`.
   - In the console, you'll see the `CapacitorHttp` request and result objects. The results vary by platform, but are both failures to work as expected:
     - iOS
-      - The request invocation doesn't blow up with an unhandled error, but the response/Blob is `null`.
+      - This error appears in the console: `Unhandled Promise Rejection: DataCloneError: The object can not be cloned.`
+      - In our production app, the error is:
+        - ```json
+          {
+            errorMessage: "Error",
+            data: {},
+            code: "REQUEST",
+            message: "Error"
+          }
+          ```
     - Android
-      - The request invocation blows up with an unhandled error: `ERROR Error: Uncaught (in promise): Error: Response is not a Blob.`
-
+      - This error appears in the console: `ERROR Error: Uncaught (in promise): HttpErrorResponse: {"headers":{"normalizedNames":{},"lazyUpdate":null},"status":400,"statusText":"OK","url":"https://file.io/","ok":false,"name":"HttpErrorResponse","message":"Http failure response for https://file.io/: 400 OK","error":{"success":false,"status":400,"code":"FILE_MISSING","message":"No file or text data found","help":"https://file.io/help/api/errors/FILE_MISSING","key":null}}`
+      - In our production app, the request doesn't blow up with an error but it doesn't seem to upload the entire file contents; the file on the server appears tiny and incomplete.
+  - If the request was successful, output similar to the following should be logged to the console:
+    - ```json
+      {
+        autoDelete: true
+        created: "2022-11-30T14:57:58.657Z"
+        description: null
+        downloads: 0
+        expires: "2022-12-14T14:57:58.657Z"
+        id: "60ff6c50-70bf-11ed-b58d-f7c591872b49"
+        key: "05XkLMYVCaBu"
+        link: "https://file.io/05XkLMYVCaBu"
+        maxDownloads: 1
+        mimeType: "image/jpeg"
+        modified: "2022-11-30T14:57:58.657Z"
+        name: "2022-Honda-CBR650R2.jpg"
+        nodeType: "file"
+        path: "/"
+        planId: 0
+        private: false
+        screeningStatus: "pending"
+        size: 267285
+        status: 200
+        success: true
+        title: null
+      }
+      ```
