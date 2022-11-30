@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { firstValueFrom, lastValueFrom } from "rxjs";
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -8,22 +8,25 @@ import { firstValueFrom, lastValueFrom } from "rxjs";
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(
-    private httpClient: HttpClient
-  ) {}
+  constructor(private httpClient: HttpClient) {}
 
-  async requestBlob() {
-    const headers = new HttpHeaders({
-      "Content-Type": "application/json",
-    });
+  async fileChanged(event: any) {
+    const file = event.target.files[0];
+
+    // Clear the input so that if the next selection attempt contains the same files
+    // the change event will still trigger.
+    event.target.value = null;
+
+    // In our production app, we are uploading files to our server and sending the File
+    // Blob *without* using FormData.
+    // For this repro, file.io seemed like a simple, reasonable solution for
+    // an endpoint that accepts file upload.
+    // However, it seems to require the use of FormData.
+    const formData = new FormData();
+    formData.append('file', file);
 
     const result = await lastValueFrom(
-      // Our production app uses an API that requests a Blob via a POST,
-      // but this issue appears reproducible using a GET.
-      this.httpClient.get('https://picsum.photos/id/237/200/300', {
-        headers,
-        responseType: 'blob',
-      })
+      this.httpClient.post('https://file.io/', formData)
     );
 
     console.log(result);
